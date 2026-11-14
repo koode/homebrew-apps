@@ -3,8 +3,10 @@
 Apps made by [Koode](https://koode.nl/?utm_source=github.com&utm_medium=referral&utm_campaign=homebrew-apps&utm_content=readme).
 
 ```bash
-brew install koode/apps/stew
+brew trust --cask koode/apps/stew && brew install --cask koode/apps/stew
 ```
+
+Homebrew loads casks from a tap other than its own only after you trust them, hence `brew trust` first.
 
 | Cask | What it is |
 |---|---|
