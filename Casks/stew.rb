@@ -1,0 +1,57 @@
+cask "stew" do
+  version "0.1.0"
+  sha256 "2ddaec5adcec3e74eddd20372aec8a83e65d52cc0afb95116ca9bc51d02fbbdb"
+
+  url "https://releases.stewcli.com/v#{version}/Stew-#{version}.zip"
+  name "Stew"
+  desc "Floating panel where Claude Code asks for permission without taking focus"
+  homepage "https://stewcli.com"
+
+  auto_updates true
+  depends_on macos: ">= :sonoma"
+
+  app "Stew.app"
+  binary "#{appdir}/Stew.app/Contents/MacOS/stew"
+  bash_completion "#{appdir}/Stew.app/Contents/Resources/completions/stew"
+  zsh_completion "#{appdir}/Stew.app/Contents/Resources/completions/_stew"
+  fish_completion "#{appdir}/Stew.app/Contents/Resources/completions/stew.fish"
+
+  # An install from the script may have written stew's own completion files where
+  # Homebrew links the cask's. They would block those links, so remove them first.
+  preflight do
+    system_command "#{staged_path}/Stew.app/Contents/MacOS/stew",
+                   args:         ["completions", "uninstall"],
+                   must_succeed: false
+  end
+
+  # The LaunchAgent, the daemon and the Claude Code skill. No hooks: those are opt-in.
+  postflight do
+    system_command "#{appdir}/Stew.app/Contents/MacOS/stew",
+                   args:         ["setup"],
+                   print_stdout: true,
+                   must_succeed: false
+  end
+
+  # Runs on upgrade too; the new version's postflight sets the LaunchAgent up again.
+  uninstall launchctl: "nl.koode.stew"
+
+  zap script: {
+        executable:   "#{appdir}/Stew.app/Contents/MacOS/stew",
+        args:         ["uninstall", "--keep-app", "--app-dir", "#{appdir}"],
+        must_succeed: false,
+      },
+      trash:  [
+        "~/.config/stew",
+        "~/Library/Application Support/stew",
+        "~/Library/Caches/stew",
+        "~/Library/Logs/stew.log",
+      ]
+
+  caveats <<~EOS
+    To ask in stew when Claude Code's auto mode blocks a call, run:
+      stew hooks install
+
+    `brew uninstall --cask stew` keeps the hooks, the skill and stew's data.
+    Run `stew hooks uninstall` first, or uninstall with --zap to remove them too.
+  EOS
+end
