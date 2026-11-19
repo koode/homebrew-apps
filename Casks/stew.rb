@@ -1,6 +1,6 @@
 cask "stew" do
-  version "0.2.2"
-  sha256 "162aa330b2e09c3d76ca5e9b9b9d4123890fd74a21d04889da7091214d6adb9a"
+  version "0.2.3"
+  sha256 "3a20add7e318951330187a77cc96024bb29a0a423683abaa10ad7fb54529b598"
 
   url "https://releases.stewcli.com/v#{version}/Stew-#{version}.zip"
   name "Stew"
